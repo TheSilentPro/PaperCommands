@@ -69,6 +69,14 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
         return Optional.ofNullable(permission);
     }
 
+    public Optional<Component> getUsageMessage(CommandSender sender) {
+        return Optional.ofNullable(usageMessage);
+    }
+
+    public Optional<Component> getPermissionMessage(CommandSender sender) {
+        return Optional.ofNullable(permissionMessage);
+    }
+
     @Override
     public void handler(CommandContext<CommandSender> ctx) {
         if (handler != null) {
@@ -85,7 +93,7 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
         // Validate the user has permission
         if (permission != null) {
             if (!sender.hasPermission(permission)) {
-                if (permissionMessage != null) sender.sendMessage(permissionMessage);
+                getPermissionMessage(sender).ifPresent(sender::sendMessage);
                 return true;
             }
         }
@@ -102,7 +110,7 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
             }
 
             if (args.length < required) {
-                if (usageMessage != null) sender.sendMessage(usageMessage.replaceText(b -> b.matchLiteral("{usage}").replacement("/" + s + " " + usage)));
+                getUsageMessage(sender).ifPresent(msg -> sender.sendMessage(msg.replaceText(b -> b.matchLiteral("{usage}").replacement("/" + s + " " + usage))));
             }
         }
 
