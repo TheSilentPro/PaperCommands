@@ -1,6 +1,7 @@
 package tsp.papercommands.command;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,5 +45,7 @@ public interface Command {
      * @param ctx The {@link CommandContext}
      */
     List<String> tabHandler(CommandContext<CommandSender> ctx);
+
+    void register(JavaPlugin plugin);
 
 }

@@ -257,7 +257,6 @@ public interface CommandContext<S> {
      * @return Context
      */
     default CommandContext<S> assertArgument(int index, Class<?> type) {
-        Optional<String> arg = rawArg(index);
         return assertArgument(index, type, null);
     }
 

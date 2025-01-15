@@ -3,7 +3,9 @@ package tsp.papercommands.command;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,11 +71,11 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
         return Optional.ofNullable(permission);
     }
 
-    public Optional<Component> getUsageMessage(CommandSender sender) {
+    public Optional<Component> getUsageMessage(CommandSender sender, String[] args) {
         return Optional.ofNullable(usageMessage);
     }
 
-    public Optional<Component> getPermissionMessage(CommandSender sender) {
+    public Optional<Component> getPermissionMessage(CommandSender sender, String[] args) {
         return Optional.ofNullable(permissionMessage);
     }
 
@@ -93,7 +95,7 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
         // Validate the user has permission
         if (permission != null) {
             if (!sender.hasPermission(permission)) {
-                getPermissionMessage(sender).ifPresent(sender::sendMessage);
+                getPermissionMessage(sender, args).ifPresent(sender::sendMessage);
                 return true;
             }
         }
@@ -110,7 +112,7 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
             }
 
             if (args.length < required) {
-                getUsageMessage(sender).ifPresent(msg -> sender.sendMessage(msg.replaceText(b -> b.matchLiteral("{usage}").replacement("/" + s + " " + usage))));
+                getUsageMessage(sender, args).ifPresent(msg -> sender.sendMessage(msg.replaceText(b -> b.matchLiteral("{usage}").replacement("/" + s + " " + usage))));
             }
         }
 
@@ -129,5 +131,15 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
     }
 
     public void onAssertionFailure(CommandInterruptException ex) {}
+
+    @Override
+    public void register(JavaPlugin plugin) {
+        PluginCommand command = plugin.getCommand(name);
+        if (command == null) {
+            throw new NullPointerException("Missing command: " + name);
+        }
+        command.setExecutor(this);
+        command.setTabCompleter(this);
+    }
 
 }
