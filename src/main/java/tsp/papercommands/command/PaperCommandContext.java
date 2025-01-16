@@ -3,7 +3,6 @@ package tsp.papercommands.command;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -107,7 +106,7 @@ public class PaperCommandContext<T extends CommandSender> implements CommandCont
             return this;
         } else {
             if (failureMessage != null) reply(failureMessage);
-            throw new CommandInterruptException(failureMessage);
+            throw new CommandAssertionException(failureMessage);
         }
     }
 
@@ -128,11 +127,6 @@ public class PaperCommandContext<T extends CommandSender> implements CommandCont
     }
 
     @Override
-    public boolean isRemoteConsole() {
-        return sender instanceof RemoteConsoleCommandSender;
-    }
-
-    @Override
     public boolean isArgument(int index, @NotNull Class<?> type) {
         return ArgumentParsers.INSTANCE.find(type).orElseThrow(() -> new NoSuchElementException("Unable to find ArgumentParser for " + type)).parse(rawArg(index).orElse("")).isPresent();
     }
@@ -144,7 +138,7 @@ public class PaperCommandContext<T extends CommandSender> implements CommandCont
             return result.get();
         } else {
             if (failureMessage != null) reply(failureMessage);
-            throw new CommandInterruptException(failureMessage);
+            throw new CommandAssertionException(failureMessage);
         }
     }
 
@@ -163,7 +157,7 @@ public class PaperCommandContext<T extends CommandSender> implements CommandCont
                     }
                 }
             }
-            throw new CommandInterruptException();
+            throw new CommandAssertionException();
         }
     }
 

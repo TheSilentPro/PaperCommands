@@ -6,13 +6,13 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 /**
  * @author TheSilentPro (Silent)
  */
-public class CommandInterruptException extends RuntimeException {
+public class CommandAssertionException extends RuntimeException {
 
-    public CommandInterruptException(Component message) {
+    public CommandAssertionException(Component message) {
         super(PlainTextComponentSerializer.plainText().serialize(message));
     }
 
-    public CommandInterruptException() {
+    public CommandAssertionException() {
         super("Command failed an assertion!");
     }
 

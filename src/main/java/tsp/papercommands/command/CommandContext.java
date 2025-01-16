@@ -3,7 +3,6 @@ package tsp.papercommands.command;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.RemoteConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import tsp.papercommands.argument.Argument;
@@ -103,8 +102,6 @@ public interface CommandContext<S> {
 
     boolean isConsole();
 
-    boolean isRemoteConsole();
-
     boolean isArgument(int index, Class<?> type);
 
     <U> U validateArgument(int index, Class<U> type, Component failureMessage);
@@ -197,25 +194,6 @@ public interface CommandContext<S> {
      */
     default CommandContext<ConsoleCommandSender> assertConsole() {
         return assertConsole(null);
-    }
-
-    /**
-     * Assert that the sender is a {@link RemoteConsoleCommandSender}.
-     *
-     * @param message Message
-     * @return Context
-     */
-    default CommandContext<RemoteConsoleCommandSender> assertRemoteConsole(Component message) {
-        return (CommandContext<RemoteConsoleCommandSender>) assertion(isConsole(), message);
-    }
-
-    /**
-     * Assert that the sender is a {@link RemoteConsoleCommandSender}.
-     *
-     * @return Context
-     */
-    default CommandContext<RemoteConsoleCommandSender> assertRemoteConsole() {
-        return assertRemoteConsole(null);
     }
 
     /**

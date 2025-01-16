@@ -46,6 +46,11 @@ public interface Command {
      */
     List<String> tabHandler(CommandContext<CommandSender> ctx);
 
+    /**
+     * Register to the provided plugin.
+     *
+     * @param plugin The owning plugin.
+     */
     void register(JavaPlugin plugin);
 
 }

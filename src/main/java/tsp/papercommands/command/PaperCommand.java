@@ -120,7 +120,7 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
         // Fire command handler, ignore thrown exceptions
         try {
             handler(new PaperCommandContext<>(sender, this, args));
-        } catch (CommandInterruptException ex) {
+        } catch (CommandAssertionException ex) {
             onAssertionFailure(ex);
         }
         return true;
@@ -131,7 +131,7 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
         return tabHandler(new PaperCommandContext<>(sender, this, args));
     }
 
-    public void onAssertionFailure(CommandInterruptException ex) {}
+    public void onAssertionFailure(CommandAssertionException ex) {}
 
     @Override
     public void register(JavaPlugin plugin) {
