@@ -113,6 +113,7 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
 
             if (args.length < required) {
                 getUsageMessage(sender, args).ifPresent(msg -> sender.sendMessage(msg.replaceText(b -> b.matchLiteral("{usage}").replacement("/" + s + " " + usage))));
+                return true;
             }
         }
 
