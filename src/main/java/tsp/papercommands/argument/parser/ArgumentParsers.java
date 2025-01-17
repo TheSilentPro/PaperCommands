@@ -76,15 +76,15 @@ public final class ArgumentParsers {
             }
         });
         register(World.class, s -> Optional.ofNullable(Bukkit.getWorld(s)));
-        ArgumentParsers.INSTANCE.register(Material.class, s -> Optional.ofNullable(Material.matchMaterial(s)));
-        ArgumentParsers.INSTANCE.register(Enchantment.class, s -> {
+        register(Material.class, s -> Optional.ofNullable(Material.matchMaterial(s)));
+        register(Enchantment.class, s -> {
             NamespacedKey key = NamespacedKey.fromString(s);
             if (key == null) {
                 return Optional.empty();
             }
             return Optional.ofNullable(RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(key));
         });
-        ArgumentParsers.INSTANCE.register(ItemFlag.class, s -> {
+        register(ItemFlag.class, s -> {
             try {
                 return Optional.of(ItemFlag.valueOf(s.toUpperCase()));
             } catch (IllegalArgumentException ex) {
@@ -93,14 +93,14 @@ public final class ArgumentParsers {
         });
 
         // Attribute parsers
-        ArgumentParsers.INSTANCE.register(Attribute.class, s -> {
+        register(Attribute.class, s -> {
             NamespacedKey key = NamespacedKey.fromString(s);
             if (key == null) {
                 return Optional.empty();
             }
             return Optional.ofNullable(Registry.ATTRIBUTE.get(key));
         });
-        ArgumentParsers.INSTANCE.register(AttributeModifier.Operation.class, s -> {
+        register(AttributeModifier.Operation.class, s -> {
             try {
                 return Optional.of(AttributeModifier.Operation.valueOf(s.toUpperCase()));
             } catch (IllegalArgumentException ex) {
@@ -108,7 +108,7 @@ public final class ArgumentParsers {
             }
         });
         //noinspection UnstableApiUsage
-        ArgumentParsers.INSTANCE.register(EquipmentSlotGroup.class, s -> {
+        register(EquipmentSlotGroup.class, s -> {
             try {
                 //noinspection UnstableApiUsage
                 return Optional.ofNullable(EquipmentSlotGroup.getByName(s.toUpperCase()));
@@ -116,7 +116,7 @@ public final class ArgumentParsers {
                 return Optional.empty();
             }
         });
-        ArgumentParsers.INSTANCE.register(AttributeModifier.class, s -> {
+        register(AttributeModifier.class, s -> {
             String delimiter = s.contains(",") ? "," : "\\|";
             String[] parts = s.split(delimiter); // Format: namespaced:key,1,add_number,slot OR namespaced:key|1|add_number|slot
             if (parts.length == 4) {
@@ -152,7 +152,7 @@ public final class ArgumentParsers {
         });
 
         // Paper
-        ArgumentParsers.INSTANCE.register(TriState.class, s -> {
+        register(TriState.class, s -> {
             if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on")) {
                 return Optional.of(TriState.TRUE);
             } else if (s.equalsIgnoreCase("false") || s.equalsIgnoreCase("No") || s.equalsIgnoreCase("off")) {
