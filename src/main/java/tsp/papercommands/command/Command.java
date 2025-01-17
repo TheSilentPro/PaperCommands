@@ -1,6 +1,7 @@
 package tsp.papercommands.command;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
@@ -51,6 +52,6 @@ public interface Command {
      *
      * @param plugin The owning plugin.
      */
-    void register(JavaPlugin plugin);
+    PluginCommand register(JavaPlugin plugin);
 
 }

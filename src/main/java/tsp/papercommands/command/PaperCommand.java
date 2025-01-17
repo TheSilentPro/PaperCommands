@@ -134,13 +134,14 @@ public class PaperCommand implements Command, CommandExecutor, TabExecutor {
     public void onAssertionFailure(CommandAssertionException ex) {}
 
     @Override
-    public void register(JavaPlugin plugin) {
+    public PluginCommand register(JavaPlugin plugin) {
         PluginCommand command = plugin.getCommand(name);
         if (command == null) {
             throw new NullPointerException("Missing command: " + name);
         }
         command.setExecutor(this);
         command.setTabCompleter(this);
+        return command;
     }
 
 }
