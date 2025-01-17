@@ -9,7 +9,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 public class CommandAssertionException extends RuntimeException {
 
     public CommandAssertionException(Component message) {
-        super(PlainTextComponentSerializer.plainText().serialize(message));
+        super(message != null ? PlainTextComponentSerializer.plainText().serialize(message) : "Assertion failed!");
     }
 
     public CommandAssertionException() {

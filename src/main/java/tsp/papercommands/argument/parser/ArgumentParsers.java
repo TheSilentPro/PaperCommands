@@ -1,12 +1,18 @@
 package tsp.papercommands.argument.parser;
 
 import com.google.common.collect.Range;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import net.kyori.adventure.util.TriState;
+import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlotGroup;
+import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -46,7 +52,6 @@ public final class ArgumentParsers {
             }
         });
         register(Duration.class, DurationParser::parseSafely);
-        register(Component.class, s -> Optional.of(MiniMessage.miniMessage().deserialize(s)));
         register(UUID.class, s -> {
             try {
                 return Optional.of(UUID.fromString(s));
@@ -54,22 +59,8 @@ public final class ArgumentParsers {
                 return Optional.empty();
             }
         });
-
-        // guava
-        register(Range.class, s -> {
-            String[] parts = s.split("-");
-            if (parts.length == 2) {
-                try {
-                    int start = Integer.parseInt(parts[0]);
-                    int end = Integer.parseInt(parts[1]);
-                    return Optional.of(Range.closed(start, end));
-                } catch (NumberFormatException e) {
-                    return Optional.empty();
-                }
-            }
-            return Optional.empty();
-        });
-
+        register(NamespacedKey.class, s -> Optional.ofNullable(NamespacedKey.fromString(s)));
+        register(Component.class, s -> Optional.of(MiniMessage.miniMessage().deserialize(s)));
         register(Player.class, s -> {
             try {
                 return Optional.ofNullable(Bukkit.getPlayer(UUID.fromString(s)));
@@ -85,6 +76,107 @@ public final class ArgumentParsers {
             }
         });
         register(World.class, s -> Optional.ofNullable(Bukkit.getWorld(s)));
+        ArgumentParsers.INSTANCE.register(Material.class, s -> Optional.ofNullable(Material.matchMaterial(s)));
+        ArgumentParsers.INSTANCE.register(Enchantment.class, s -> {
+            NamespacedKey key = NamespacedKey.fromString(s);
+            if (key == null) {
+                return Optional.empty();
+            }
+            return Optional.ofNullable(RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(key));
+        });
+        ArgumentParsers.INSTANCE.register(ItemFlag.class, s -> {
+            try {
+                return Optional.of(ItemFlag.valueOf(s.toUpperCase()));
+            } catch (IllegalArgumentException ex) {
+                return Optional.empty();
+            }
+        });
+
+        // Attribute parsers
+        ArgumentParsers.INSTANCE.register(Attribute.class, s -> {
+            NamespacedKey key = NamespacedKey.fromString(s);
+            if (key == null) {
+                return Optional.empty();
+            }
+            return Optional.ofNullable(Registry.ATTRIBUTE.get(key));
+        });
+        ArgumentParsers.INSTANCE.register(AttributeModifier.Operation.class, s -> {
+            try {
+                return Optional.of(AttributeModifier.Operation.valueOf(s.toUpperCase()));
+            } catch (IllegalArgumentException ex) {
+                return Optional.empty();
+            }
+        });
+        //noinspection UnstableApiUsage
+        ArgumentParsers.INSTANCE.register(EquipmentSlotGroup.class, s -> {
+            try {
+                //noinspection UnstableApiUsage
+                return Optional.ofNullable(EquipmentSlotGroup.getByName(s.toUpperCase()));
+            } catch (IllegalArgumentException ex) {
+                return Optional.empty();
+            }
+        });
+        ArgumentParsers.INSTANCE.register(AttributeModifier.class, s -> {
+            String delimiter = s.contains(",") ? "," : "\\|";
+            String[] parts = s.split(delimiter); // Format: namespaced:key,1,add_number,slot OR namespaced:key|1|add_number|slot
+            if (parts.length == 4) {
+                NamespacedKey key = NamespacedKey.fromString(parts[0]);
+                if (key == null) {
+                    return Optional.empty();
+                }
+
+                double amount = 0;
+                try {
+                    amount = Integer.parseInt(parts[1]);
+                } catch (NumberFormatException nfe) {
+                    return Optional.empty();
+                }
+
+                AttributeModifier.Operation operation;
+                try {
+                    operation = AttributeModifier.Operation.valueOf(parts[2].toUpperCase());
+                } catch (IllegalArgumentException ex) {
+                    return Optional.empty();
+                }
+
+                //noinspection UnstableApiUsage
+                EquipmentSlotGroup slot = EquipmentSlotGroup.getByName(parts[3]);
+                if (slot == null) {
+                    return Optional.empty();
+                }
+
+                //noinspection UnstableApiUsage
+                return Optional.of(new AttributeModifier(key, amount, operation, slot));
+            }
+            return Optional.empty();
+        });
+
+        // Paper
+        ArgumentParsers.INSTANCE.register(TriState.class, s -> {
+            if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("on")) {
+                return Optional.of(TriState.TRUE);
+            } else if (s.equalsIgnoreCase("false") || s.equalsIgnoreCase("No") || s.equalsIgnoreCase("off")) {
+                return Optional.of(TriState.FALSE);
+            } else if (s.equalsIgnoreCase("none") || s.equalsIgnoreCase("null") || s.equalsIgnoreCase("not_set") || s.equalsIgnoreCase("notset") || s.equalsIgnoreCase("unknown") || s.equalsIgnoreCase("reset") || s.equalsIgnoreCase("clear")) {
+                return Optional.of(TriState.NOT_SET);
+            } else {
+                return Optional.empty();
+            }
+        });
+        // guava
+        register(Range.class, s -> {
+            String[] parts = s.split("-");
+            if (parts.length == 2) {
+                try {
+                    int start = Integer.parseInt(parts[0]);
+                    int end = Integer.parseInt(parts[1]);
+                    return Optional.of(Range.closed(start, end));
+                } catch (NumberFormatException e) {
+                    return Optional.empty();
+                }
+            }
+            return Optional.empty();
+        });
     }
 
     @NotNull
