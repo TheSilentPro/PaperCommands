@@ -26,6 +26,13 @@ public class PaperCommandContext<T extends CommandSender> implements CommandCont
     private final Set<String> options;
     private final Command command;
 
+    public PaperCommandContext(T sender, Command command, String[] args, Set<String> options) {
+        this.sender = sender;
+        this.arguments = new ArrayList<>(Arrays.asList(args)); // Mutable
+        this.options = options;
+        this.command = command;
+    }
+
     public PaperCommandContext(T sender, Command command, String[] args) {
         this.sender = sender;
         this.arguments = new ArrayList<>(Arrays.asList(args)); // Mutable
@@ -36,7 +43,7 @@ public class PaperCommandContext<T extends CommandSender> implements CommandCont
         for (Iterator<String> iterator = arguments.iterator(); iterator.hasNext();) {
             String arg = iterator.next();
             if (arg.startsWith(optionPrefix())) {
-                options.add(arg.substring(optionPrefix().length()));
+                this.options.add(arg.substring(optionPrefix().length()));
                 iterator.remove();
             }
         }
